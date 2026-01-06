@@ -50,6 +50,7 @@ auth_from_opts() {
 }
 
 REPO_URL="$(jq -r .repo_url /data/options.json)"
+REPO_REF="$(jq -r .repo_ref /data/options.json 2>/dev/null || true)"
 TOKEN_OPT="$(jq -r .github_token /data/options.json)"
 
 if [ -z "${REPO_URL}" ] || [ "${REPO_URL}" = "null" ]; then
@@ -107,16 +108,32 @@ else
   log "sshd disabled (no authorized keys)"
 fi
 
+if [ "${REPO_REF}" = "null" ]; then
+  REPO_REF=""
+fi
+
+if [ -n "${REPO_REF}" ]; then
+  log "repo ref=${REPO_REF}"
+fi
+
 if [ ! -d "${REPO_DIR}/.git" ]; then
   log "cloning repo ${REPO_URL} -> ${REPO_DIR}"
   rm -rf "${REPO_DIR}"
   git clone "${REPO_URL}" "${REPO_DIR}"
+  if [ -n "${REPO_REF}" ]; then
+    git -C "${REPO_DIR}" checkout --detach "${REPO_REF}"
+  fi
 else
   log "updating repo in ${REPO_DIR}"
   git -C "${REPO_DIR}" remote set-url origin "${REPO_URL}"
   git -C "${REPO_DIR}" fetch --prune
-  git -C "${REPO_DIR}" checkout main
-  git -C "${REPO_DIR}" reset --hard origin/main
+  if [ -n "${REPO_REF}" ]; then
+    git -C "${REPO_DIR}" checkout --detach "${REPO_REF}"
+    git -C "${REPO_DIR}" reset --hard "${REPO_REF}"
+  else
+    git -C "${REPO_DIR}" checkout main
+    git -C "${REPO_DIR}" reset --hard origin/main
+  fi
   git -C "${REPO_DIR}" clean -fd
 fi
 

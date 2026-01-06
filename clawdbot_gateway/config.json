@@ -1,6 +1,6 @@
 {
   "name": "Clawdbot Gateway",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "slug": "clawdbot_gateway",
   "description": "Clawdbot Gateway (SSH-tunneled, HA add-on)",
   "url": "https://github.com/clawdbot/clawdbot",
@@ -16,6 +16,7 @@
     "port": 18789,
     "verbose": false,
     "repo_url": "https://github.com/clawdbot/clawdbot.git",
+    "repo_ref": "ea6ee164",
     "github_token": "",
     "ssh_port": 2222,
     "ssh_authorized_keys": ""
@@ -24,6 +25,7 @@
     "port": "int(1,65535)",
     "verbose": "bool",
     "repo_url": "str",
+    "repo_ref": "str?",
     "github_token": "str?",
     "ssh_port": "int(1,65535)",
     "ssh_authorized_keys": "str?"
