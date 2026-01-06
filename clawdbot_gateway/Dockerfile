@@ -6,6 +6,7 @@ RUN apt-get update \
     ca-certificates \
     git \
     jq \
+    ripgrep \
     curl \
     nano \
     python3 \

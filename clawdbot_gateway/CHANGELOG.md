@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+- Docs: repo-based install steps and add-on info links.
+- Docker: set WORKDIR to /opt/clawdbot.
+- Logs: stream gateway log file into add-on stdout.
+- Docker: add ripgrep for faster log searches.
+
 ## 0.2.3
 - Docs: repo-based install steps and add-on info links.
 - Docker: set WORKDIR to /opt/clawdbot.
