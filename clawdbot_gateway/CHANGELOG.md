@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.7
+- Docker: install clawdhub and Home Assistant CLI.
+
 ## 0.2.6
 - Auto-restart gateway on unclean exits (e.g., shutdown timeout).
 

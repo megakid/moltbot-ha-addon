@@ -10,12 +10,21 @@ RUN apt-get update \
     curl \
     nano \
     python3 \
+    python3-pip \
     make \
     g++ \
     openssh-server \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm@9.12.3
+ENV PNPM_HOME=/pnpm
+ENV PATH="${PNPM_HOME}:${PATH}"
+
+RUN npm install -g pnpm@9.12.3 \
+  && mkdir -p /pnpm \
+  && pnpm config set global-bin-dir /pnpm \
+  && pnpm add -g clawdhub
+
+RUN pip3 install --no-cache-dir --break-system-packages homeassistant-cli
 
 # Install gog CLI (Google Workspace: Gmail, Calendar, Drive, Contacts, Sheets, Docs)
 ARG GOG_VERSION=0.4.2
