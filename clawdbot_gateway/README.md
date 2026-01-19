@@ -12,7 +12,7 @@ Run the Clawdbot Gateway on Home Assistant OS and access it securely over an SSH
 ## Install (Repository Add-on)
 1) In Home Assistant UI:
    - Settings → Add-ons → Add-on Store → menu (⋮) → Repositories.
-   - Add: `https://github.com/ngutman/clawdbot-ha-addon`
+   - Add: `https://github.com/WolframRavenwolf/clawdbot-ha-addon`
 2) Reload the Add-on Store and install “Clawdbot Gateway”.
 
 ## Configure Add-on Options
@@ -79,4 +79,4 @@ Use `pnpm clawdbot configure` or `pnpm clawdbot onboard` to set it in `clawdbot.
 
 ## Links
 - Clawdbot repo: https://github.com/clawdbot/clawdbot
-- Add-on repo: https://github.com/ngutman/clawdbot-ha-addon
+- Add-on repo: https://github.com/WolframRavenwolf/clawdbot-ha-addon

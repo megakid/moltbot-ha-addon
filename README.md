@@ -16,7 +16,7 @@ Clawdbot Gateway for HA OS with SSH tunnel support for Mac node connections.
 1. Go to **Settings → Add-ons → Add-on Store → ⋮ → Repositories**
 2. Add this repository:
    ```
-   https://github.com/ngutman/clawdbot-ha-addon
+   https://github.com/WolframRavenwolf/clawdbot-ha-addon
    ```
 3. Find "Clawdbot Gateway" in the add-on store and install
 
