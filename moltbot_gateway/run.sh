@@ -58,6 +58,14 @@ fi
 export HOME="${BASE_DIR}"
 export MOLTBOT_STATE_DIR="${STATE_DIR}"
 export MOLTBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
+export CLAWDBOT_STATE_DIR="${STATE_DIR}"
+export CLAWDBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
+
+if [ -n "${MOLTBOT_GATEWAY_TOKEN:-}" ] && [ -z "${CLAWDBOT_GATEWAY_TOKEN:-}" ]; then
+  export CLAWDBOT_GATEWAY_TOKEN="${MOLTBOT_GATEWAY_TOKEN}"
+elif [ -n "${CLAWDBOT_GATEWAY_TOKEN:-}" ] && [ -z "${MOLTBOT_GATEWAY_TOKEN:-}" ]; then
+  export MOLTBOT_GATEWAY_TOKEN="${CLAWDBOT_GATEWAY_TOKEN}"
+fi
 
 log "config path=${MOLTBOT_CONFIG_PATH}"
 
@@ -65,9 +73,16 @@ cat > /etc/profile.d/moltbot.sh <<EOF
 export HOME="${BASE_DIR}"
 export GH_CONFIG_DIR="${BASE_DIR}/.config/gh"
 export PATH="${BASE_DIR}/bin:\${PATH}"
+export MOLTBOT_STATE_DIR="${STATE_DIR}"
+export MOLTBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
+export CLAWDBOT_STATE_DIR="${STATE_DIR}"
+export CLAWDBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
+if [ -n "\${MOLTBOT_GATEWAY_TOKEN:-}" ] && [ -z "\${CLAWDBOT_GATEWAY_TOKEN:-}" ]; then
+  export CLAWDBOT_GATEWAY_TOKEN="\${MOLTBOT_GATEWAY_TOKEN}"
+elif [ -n "\${CLAWDBOT_GATEWAY_TOKEN:-}" ] && [ -z "\${MOLTBOT_GATEWAY_TOKEN:-}" ]; then
+  export MOLTBOT_GATEWAY_TOKEN="\${CLAWDBOT_GATEWAY_TOKEN}"
+fi
 if [ -n "\${SSH_CONNECTION:-}" ]; then
-  export MOLTBOT_STATE_DIR="${STATE_DIR}"
-  export MOLTBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
   cd "${REPO_DIR}" 2>/dev/null || true
 fi
 EOF
