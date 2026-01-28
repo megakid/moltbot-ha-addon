@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.18
+- Rename legacy clawd* paths under /config/moltbot on startup.
+
 ## 0.2.17
 - Export legacy CLAWDBOT_* env aliases for gateway token/config compatibility.
 
