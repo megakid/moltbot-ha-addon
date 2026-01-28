@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.19
+- Remove gateway token env var aliasing.
+
 ## 0.2.18
 - Rename legacy clawd* paths under /config/moltbot on startup.
 
