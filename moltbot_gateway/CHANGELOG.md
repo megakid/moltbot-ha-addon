@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.17
+- Export legacy CLAWDBOT_* env aliases for gateway token/config compatibility.
+
 ## 0.2.16
 - Migrate legacy /config/clawdbot data to /config/moltbot on startup.
 
