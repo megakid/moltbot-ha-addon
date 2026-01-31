@@ -133,10 +133,12 @@ else
   log "sshd disabled (no authorized keys)"
 fi
 
+REPO_CLONED=0
 if [ ! -d "${REPO_DIR}/.git" ]; then
   log "cloning repo ${REPO_URL} -> ${REPO_DIR}"
   rm -rf "${REPO_DIR}"
   git clone "${REPO_URL}" "${REPO_DIR}"
+  REPO_CLONED=1
 else
   log "using repo in ${REPO_DIR}"
   git -C "${REPO_DIR}" remote set-url origin "${REPO_URL}"
@@ -160,8 +162,18 @@ fi
 
 after_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"
 
-if [ -n "${before_sha}" ] && [ -n "${after_sha}" ] && [ "${before_sha}" != "${after_sha}" ]; then
+should_install=0
+if [ "${REPO_CLONED}" -eq 1 ]; then
+  log "repo freshly cloned; running git install"
+  should_install=1
+elif [ -n "${before_sha}" ] && [ -n "${after_sha}" ] && [ "${before_sha}" != "${after_sha}" ]; then
   log "repo updated (${before_sha} -> ${after_sha}); running git install"
+  should_install=1
+else
+  log "repo unchanged; skipping git install"
+fi
+
+if [ "${should_install}" -eq 1 ]; then
   OPENCLAW_INSTALL_METHOD=git \
     OPENCLAW_GIT_DIR="${REPO_DIR}" \
     OPENCLAW_GIT_UPDATE=0 \
@@ -173,8 +185,6 @@ if [ -n "${before_sha}" ] && [ -n "${after_sha}" ] && [ "${before_sha}" != "${af
       --no-git-update \
       --no-prompt \
       --no-onboard
-else
-  log "repo unchanged; skipping git install"
 fi
 
 if [ "${UPDATE_CHANNEL}" = "null" ]; then

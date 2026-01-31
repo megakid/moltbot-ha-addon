@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.2
+- Startup: run OpenClaw git installer on first clone to avoid missing dist on initial boot.
+
 ## 0.4.1
 - Add update_channel option to select stable/beta/dev via add-on config.
 
