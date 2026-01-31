@@ -102,6 +102,8 @@ if [ -z "${SSH_PORT}" ] || [ "${SSH_PORT}" = "null" ]; then
   else
     SSH_PORT="2222"
   fi
+else
+  log "git fetch failed; continuing without update"
 fi
 
 if [ -z "${SSH_KEYS}" ] || [ "${SSH_KEYS}" = "null" ]; then
@@ -151,7 +153,7 @@ fi
 before_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"
 
 log "checking for repo updates"
-if git -C "${REPO_DIR}" fetch --all --prune --tags; then
+if git -C "${REPO_DIR}" fetch --all --prune --tags --force; then
   if [ -n "${REPO_REF}" ]; then
     resolved_sha="$(git -C "${REPO_DIR}" rev-parse --verify --quiet "${REPO_REF}^{commit}" 2>/dev/null || true)"
     if [ -z "${resolved_sha}" ]; then
@@ -180,8 +182,6 @@ if git -C "${REPO_DIR}" fetch --all --prune --tags; then
       exit 1
     fi
   fi
-else
-  log "git fetch failed; continuing without update"
 fi
 
 after_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"

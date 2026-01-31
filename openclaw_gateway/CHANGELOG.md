@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.7
+- Startup: always fetch tags with --force to avoid clobber errors.
+
 ## 0.4.6
 - Startup: run OpenClaw git installer only when repo changes or dist entry is missing.
 
