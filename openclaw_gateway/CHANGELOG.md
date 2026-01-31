@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.4
+- Startup: exit after `openclaw update --no-restart` to simulate restart.
+
 ## 0.4.3
 - Startup: run OpenClaw git installer if dist entry is missing.
 

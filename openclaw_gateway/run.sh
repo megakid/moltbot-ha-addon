@@ -224,6 +224,8 @@ if [ -n "${UPDATE_CHANNEL}" ]; then
 fi
 update_args+=(--no-restart)
 pnpm openclaw "${update_args[@]}"
+log "openclaw update complete; exiting to simulate restart"
+exit 0
 
 if [ ! -f "${OPENCLAW_CONFIG_PATH}" ]; then
   pnpm openclaw setup

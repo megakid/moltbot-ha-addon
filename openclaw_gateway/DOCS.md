@@ -40,9 +40,10 @@ The add-on performs these steps on startup:
 2. Runs the OpenClaw git installer on first clone or when `dist/entry.js` is missing
 3. Bootstraps the OpenClaw CLI if needed
 4. Runs `pnpm openclaw update --no-restart` (handles fetch/build/doctor)
-5. Runs `openclaw setup` if no config exists
-6. Ensures `gateway.mode=local` if missing
-7. Starts the gateway
+5. Exits to simulate restart after update
+6. Runs `openclaw setup` if no config exists
+7. Ensures `gateway.mode=local` if missing
+8. Starts the gateway
 
 ### OpenClaw Configuration
 
