@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1
+- Add update_channel option to select stable/beta/dev via add-on config.
+
+## 0.4.0
+- BREAKING: remove ref pinning; rely on `openclaw update` for source updates.
+- Startup: run `pnpm openclaw update --no-restart` instead of manual git/pnpm build steps.
+- Docs: document update-channel switching via OpenClaw CLI.
+
 ## 0.3.0
 - Rename add-on to OpenClaw and refresh documentation/metadata.
 - Switch persistent data root to /config/openclaw.

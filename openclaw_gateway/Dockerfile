@@ -84,7 +84,7 @@ RUN go install github.com/steipete/camsnap/cmd/camsnap@${CAMSNAP_VERSION} && go 
 RUN go install github.com/steipete/eightctl/cmd/eightctl@${EIGHTCTL_VERSION} && go clean -cache -modcache
 
 # [🟥] ♊️ gemini - Gemini CLI for one-shot Q&A, summaries, and generation.
-RUN npm install -g @google/gemini-cli
+RUN pnpm add -g @google/gemini-cli
 
 # [🐹] 🧲 gifgrep - Search GIF providers with CLI/TUI, download results, and extract stills/sheets.
 RUN go install github.com/steipete/gifgrep/cmd/gifgrep@${GIFGREP_VERSION} && go clean -cache -modcache
@@ -131,7 +131,7 @@ RUN case "${TARGETARCH}" in \
        fi
 
 # [🟥] 🧿 oracle - Best practices for using the oracle CLI (prompt + file bundling, engines, sessions, and file attachment patterns).
-RUN npm install -g @steipete/oracle
+RUN pnpm add -g @steipete/oracle
 
 # [🐹] 🛵 ordercli - Foodora-only CLI for checking past orders and active order status (Deliveroo WIP).
 RUN go install github.com/steipete/ordercli/cmd/ordercli@${ORDERCLI_VERSION} && go clean -cache -modcache
@@ -147,7 +147,7 @@ RUN go install github.com/steipete/songsee/cmd/songsee@${SONGSEE_VERSION} && go 
 RUN go install github.com/steipete/sonoscli/cmd/sonos@${SONOSCLI_VERSION} && go clean -cache -modcache
 
 # [🟥] 🧾 summarize - Summarize or extract text/transcripts from URLs, podcasts, and local files (great fallback for “transcribe this YouTube/video”).
-RUN npm install -g @steipete/summarize
+RUN pnpm add -g @steipete/summarize
 
 # [🍥] 🧵 tmux - Remote-control tmux sessions for interactive CLIs by sending keystrokes and scraping pane output.
 # apt install tmux

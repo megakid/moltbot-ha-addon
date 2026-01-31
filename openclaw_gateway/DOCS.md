@@ -25,7 +25,7 @@ This add-on runs the OpenClaw Gateway on Home Assistant OS, providing secure rem
 | `ssh_port` | SSH server port (default: `2222`) |
 | `port` | Gateway WebSocket port (default: `18789`) |
 | `repo_url` | OpenClaw source repository URL |
-| `ref` | Branch, tag, or commit to checkout (uses repo default if omitted) |
+| `update_channel` | Update channel for `openclaw update`: `stable`, `beta`, or `dev` |
 | `github_token` | Token for private repository access |
 | `verbose` | Enable verbose logging |
 | `log_format` | Log output format in the add-on Log tab: `pretty` or `raw` |
@@ -37,10 +37,11 @@ This add-on runs the OpenClaw Gateway on Home Assistant OS, providing secure rem
 The add-on performs these steps on startup:
 
 1. Clones or updates the OpenClaw repo into `/config/openclaw/openclaw-src`
-2. Installs dependencies and builds the gateway
-3. Runs `openclaw setup` if no config exists
-4. Ensures `gateway.mode=local` if missing
-5. Starts the gateway
+2. Bootstraps the OpenClaw CLI if needed
+3. Runs `pnpm openclaw update --no-restart` (handles fetch/build/doctor)
+4. Runs `openclaw setup` if no config exists
+5. Ensures `gateway.mode=local` if missing
+6. Starts the gateway
 
 ### OpenClaw Configuration
 
@@ -82,6 +83,10 @@ Configure bind mode via the OpenClaw CLI (over SSH), not in the add-on options.
 Use `pnpm openclaw configure` or `pnpm openclaw onboard` to set it in `openclaw.json`.
 
 If you bind beyond loopback (`lan/tailnet/auto`), ensure gateway authentication is configured in `openclaw.json`.
+
+### Update Channel
+
+Set `update_channel` in the add-on options to `stable`, `beta`, or `dev`, then restart the add-on to apply.
 
 ## Data Locations
 
