@@ -1,10 +1,10 @@
 {
-  "name": "Moltbot Gateway",
-  "version": "0.2.20",
-  "slug": "moltbot_gateway",
-  "description": "Moltbot Gateway (SSH-tunneled, HA add-on)",
-  "url": "https://github.com/WolframRavenwolf/moltbot-ha-addon",
-  "documentation": "https://github.com/WolframRavenwolf/moltbot-ha-addon",
+  "name": "OpenClaw Gateway",
+  "version": "0.3.0",
+  "slug": "openclaw_gateway",
+  "description": "OpenClaw Gateway (SSH-tunneled, HA add-on)",
+  "url": "https://github.com/megakid/openclaw-ha-addon",
+  "documentation": "https://github.com/megakid/openclaw-ha-addon",
   "arch": ["aarch64", "armv7", "amd64"],
   "startup": "services",
   "boot": "auto",
@@ -13,8 +13,8 @@
   "homeassistant_api": false,
   "map": ["config:rw"],
   "environment": {
-    "HOME": "/config/moltbot",
-    "GH_CONFIG_DIR": "/config/moltbot/.config/gh"
+    "HOME": "/config/openclaw",
+    "GH_CONFIG_DIR": "/config/openclaw/.config/gh"
   },
   "options": {
     "port": 18789,
@@ -22,8 +22,8 @@
     "log_format": "pretty",
     "log_color": false,
     "log_fields": "",
-    "repo_url": "https://github.com/moltbot/moltbot.git",
-    "branch": "",
+    "repo_url": "https://github.com/openclaw/openclaw.git",
+    "ref": "v2026.1.29",
     "github_token": "",
     "ssh_port": 2222,
     "ssh_authorized_keys": ""
@@ -35,7 +35,7 @@
     "log_color": "bool",
     "log_fields": "str?",
     "repo_url": "str",
-    "branch": "str?",
+    "ref": "str?",
     "github_token": "password?",
     "ssh_port": "int(1,65535)",
     "ssh_authorized_keys": "str?"

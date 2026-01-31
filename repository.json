@@ -1,5 +1,5 @@
 {
-  "name": "Moltbot Home Assistant Add-ons",
-  "url": "https://github.com/WolframRavenwolf/moltbot-ha-addon",
-  "maintainer": "Wolfram Ravenwolf"
+  "name": "OpenClaw Home Assistant Add-ons",
+  "url": "https://github.com/megakid/openclaw-ha-addon",
+  "maintainer": "megakid"
 }

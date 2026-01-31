@@ -1,11 +1,11 @@
-# Moltbot Home Assistant Add-ons
+# OpenClaw Home Assistant Add-ons
 
-This repository contains Home Assistant add-ons for Moltbot.
+This repository contains Home Assistant add-ons for OpenClaw.
 
 ## Add-ons
 
-### moltbot_gateway
-Moltbot Gateway for HA OS with SSH tunnel support for Mac node connections.
+### openclaw_gateway
+OpenClaw Gateway for HA OS with SSH tunnel support for Mac node connections.
 
 **Included tools:**
 - **gog** — Google Workspace CLI (Gmail, Calendar, Drive, Contacts, Sheets, Docs). See [gogcli.sh](https://gogcli.sh)
@@ -16,9 +16,9 @@ Moltbot Gateway for HA OS with SSH tunnel support for Mac node connections.
 1. Go to **Settings → Add-ons → Add-on Store → ⋮ → Repositories**
 2. Add this repository:
    ```
-   https://github.com/WolframRavenwolf/moltbot-ha-addon
+   https://github.com/megakid/openclaw-ha-addon
    ```
-3. Find "Moltbot Gateway" in the add-on store and install
+3. Find "OpenClaw Gateway" in the add-on store and install
 
 ## Configuration
 
@@ -26,13 +26,13 @@ Moltbot Gateway for HA OS with SSH tunnel support for Mac node connections.
 |--------|-------------|
 | `port` | Gateway WebSocket port (default: 18789) |
 | `verbose` | Enable verbose logging |
-| `repo_url` | Moltbot source repository |
-| `branch` | Branch to checkout (optional, uses repo's default if omitted) |
+| `repo_url` | OpenClaw source repository |
+| `ref` | Branch, tag, or commit to checkout (optional, uses repo default if omitted) |
 | `github_token` | GitHub token for private repos |
 | `ssh_port` | SSH server port for tunnel access (default: 2222) |
 | `ssh_authorized_keys` | Public keys for SSH access |
 
 ## Links
-- [Moltbot](https://github.com/moltbot/moltbot)
-- [gog CLI](https://gogcli.sh)
-- [GitHub CLI](https://cli.github.com)
+- [OpenClaw](https://github.com/openclaw/openclaw)
+- [OpenClaw Docs](https://docs.openclaw.ai)
+- [Website](https://openclaw.ai)

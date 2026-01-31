@@ -1,11 +1,11 @@
 # Repository Guidelines
-- Repo: https://github.com/ngutman/moltbot-ha-addon
+- Repo: https://github.com/megakid/openclaw-ha-addon
 
 ## Project Structure & Files
-- Add-on source and metadata live in `moltbot_gateway/`.
-- Add-on metadata: `moltbot_gateway/config.json` (version, options, ingress settings).
-- Docs: `moltbot_gateway/README.md`, `moltbot_gateway/DOCS.md`.
-- Changelog: `moltbot_gateway/CHANGELOG.md` (latest release at top, no `Unreleased`).
+- Add-on source and metadata live in `openclaw_gateway/`.
+- Add-on metadata: `openclaw_gateway/config.json` (version, options, ingress settings).
+- Docs: `openclaw_gateway/README.md`, `openclaw_gateway/DOCS.md`.
+- Changelog: `openclaw_gateway/CHANGELOG.md` (latest release at top, no `Unreleased`).
 
 ## Commit Messages
 - Follow conventional commit format: `type(scope): short description`.

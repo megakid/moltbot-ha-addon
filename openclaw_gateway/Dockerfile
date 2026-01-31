@@ -160,7 +160,7 @@ RUN go install github.com/steipete/wacli/cmd/wacli@${WACLI_VERSION} && go clean 
 
 # ------------------------------------------------------------------------------
 
-WORKDIR /opt/moltbot
+WORKDIR /opt/openclaw
 
 COPY run.sh /run.sh
 RUN chmod +x /run.sh

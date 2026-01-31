@@ -5,103 +5,12 @@ log() {
   printf "[addon] %s\n" "$*"
 }
 
-log "run.sh version=2026-01-19-branch-tags"
+log "run.sh version=2026-01-31-openclaw-ref"
 
-LEGACY_BASE_DIR=/config/clawdbot
-TARGET_BASE_DIR=/config/moltbot
-
-rename_legacy_files() {
-  local root="$1"
-  local path dir base new_base new_path renamed=0
-
-  if [ ! -d "${root}" ]; then
-    return
-  fi
-
-  while IFS= read -r -d '' path; do
-    dir="$(dirname "${path}")"
-    base="$(basename "${path}")"
-    new_base="${base//clawd/molt}"
-    if [ "${base}" = "${new_base}" ]; then
-      continue
-    fi
-    new_path="${dir}/${new_base}"
-    if [ -e "${new_path}" ]; then
-      log "skip rename ${path} -> ${new_path} (exists)"
-      continue
-    fi
-    mv "${path}" "${new_path}"
-    renamed=$((renamed + 1))
-  done < <(find "${root}" -type f -name "*clawd*" -print0)
-
-  while IFS= read -r -d '' path; do
-    dir="$(dirname "${path}")"
-    base="$(basename "${path}")"
-    new_base="${base//clawd/molt}"
-    if [ "${base}" = "${new_base}" ]; then
-      continue
-    fi
-    new_path="${dir}/${new_base}"
-    if [ -e "${new_path}" ]; then
-      log "skip rename ${path} -> ${new_path} (exists)"
-      continue
-    fi
-    mv "${path}" "${new_path}"
-    renamed=$((renamed + 1))
-  done < <(find "${root}" -type l -name "*clawd*" -print0)
-
-  if [ "${renamed}" -gt 0 ]; then
-    log "renamed ${renamed} legacy files under ${root}"
-  fi
-}
-
-rename_legacy_dirs() {
-  local root="$1"
-  local path dir base new_base new_path renamed=0
-
-  if [ ! -d "${root}" ]; then
-    return
-  fi
-
-  while IFS= read -r -d '' path; do
-    if [ "${path}" = "${root}" ]; then
-      continue
-    fi
-    dir="$(dirname "${path}")"
-    base="$(basename "${path}")"
-    new_base="${base//clawd/molt}"
-    if [ "${base}" = "${new_base}" ]; then
-      continue
-    fi
-    new_path="${dir}/${new_base}"
-    if [ -e "${new_path}" ]; then
-      log "skip rename ${path} -> ${new_path} (exists)"
-      continue
-    fi
-    mv "${path}" "${new_path}"
-    renamed=$((renamed + 1))
-  done < <(find "${root}" -depth -type d -name "*clawd*" -print0)
-
-  if [ "${renamed}" -gt 0 ]; then
-    log "renamed ${renamed} legacy dirs under ${root}"
-  fi
-}
-
-if [ -d "${LEGACY_BASE_DIR}" ] && [ ! -d "${TARGET_BASE_DIR}" ]; then
-  log "migrating ${LEGACY_BASE_DIR} -> ${TARGET_BASE_DIR}"
-  rename_legacy_files "${LEGACY_BASE_DIR}"
-  rename_legacy_dirs "${LEGACY_BASE_DIR}"
-  mv "${LEGACY_BASE_DIR}" "${TARGET_BASE_DIR}"
-elif [ -d "${LEGACY_BASE_DIR}" ] && [ -d "${TARGET_BASE_DIR}" ]; then
-  log "legacy config dir ${LEGACY_BASE_DIR} present; keeping ${TARGET_BASE_DIR}"
-  rename_legacy_files "${LEGACY_BASE_DIR}"
-  rename_legacy_dirs "${LEGACY_BASE_DIR}"
-fi
-
-BASE_DIR=/config/moltbot
-STATE_DIR="${BASE_DIR}/.moltbot"
-REPO_DIR="${BASE_DIR}/moltbot-src"
-WORKSPACE_DIR="${BASE_DIR}/workspace"
+BASE_DIR=/config/openclaw
+STATE_DIR="${BASE_DIR}/.openclaw"
+REPO_DIR="${BASE_DIR}/openclaw-src"
+WORKSPACE_DIR="${STATE_DIR}/workspace"
 SSH_AUTH_DIR="${BASE_DIR}/.ssh"
 
 mkdir -p "${BASE_DIR}" "${STATE_DIR}" "${WORKSPACE_DIR}" "${SSH_AUTH_DIR}"
@@ -126,12 +35,12 @@ for dir in .ssh .config .local .cache .npm; do
 done
 log "persistent home symlinks configured"
 
-if [ -d /root/.moltbot ] && [ ! -f "${STATE_DIR}/moltbot.json" ]; then
-  cp -a /root/.moltbot/. "${STATE_DIR}/"
+if [ -d /root/.openclaw ] && [ ! -f "${STATE_DIR}/openclaw.json" ]; then
+  cp -a /root/.openclaw/. "${STATE_DIR}/"
 fi
 
-if [ -d /root/moltbot-src ] && [ ! -d "${REPO_DIR}" ]; then
-  mv /root/moltbot-src "${REPO_DIR}"
+if [ -d /root/openclaw-src ] && [ ! -d "${REPO_DIR}" ]; then
+  mv /root/openclaw-src "${REPO_DIR}"
 fi
 
 if [ -d /root/workspace ] && [ ! -d "${WORKSPACE_DIR}" ]; then
@@ -139,25 +48,21 @@ if [ -d /root/workspace ] && [ ! -d "${WORKSPACE_DIR}" ]; then
 fi
 
 export HOME="${BASE_DIR}"
-export MOLTBOT_STATE_DIR="${STATE_DIR}"
-export MOLTBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
-export CLAWDBOT_STATE_DIR="${STATE_DIR}"
-export CLAWDBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
+export OPENCLAW_STATE_DIR="${STATE_DIR}"
+export OPENCLAW_CONFIG_PATH="${STATE_DIR}/openclaw.json"
 
-log "config path=${MOLTBOT_CONFIG_PATH}"
+log "config path=${OPENCLAW_CONFIG_PATH}"
 
-cat > /etc/profile.d/moltbot.sh <<EOF
-export HOME="${BASE_DIR}"
-export GH_CONFIG_DIR="${BASE_DIR}/.config/gh"
-export PATH="${BASE_DIR}/bin:\${PATH}"
-export MOLTBOT_STATE_DIR="${STATE_DIR}"
-export MOLTBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
-export CLAWDBOT_STATE_DIR="${STATE_DIR}"
-export CLAWDBOT_CONFIG_PATH="${STATE_DIR}/moltbot.json"
-if [ -n "\${SSH_CONNECTION:-}" ]; then
-  cd "${REPO_DIR}" 2>/dev/null || true
+cat > /etc/profile.d/openclaw.sh <<'EOF_PROFILE'
+export HOME="/config/openclaw"
+export GH_CONFIG_DIR="/config/openclaw/.config/gh"
+export PATH="/config/openclaw/bin:${PATH}"
+export OPENCLAW_STATE_DIR="/config/openclaw/.openclaw"
+export OPENCLAW_CONFIG_PATH="/config/openclaw/.openclaw/openclaw.json"
+if [ -n "${SSH_CONNECTION:-}" ]; then
+  cd "/config/openclaw/openclaw-src" 2>/dev/null || true
 fi
-EOF
+EOF_PROFILE
 
 auth_from_opts() {
   local val
@@ -168,8 +73,8 @@ auth_from_opts() {
 }
 
 REPO_URL="$(jq -r .repo_url /data/options.json)"
-BRANCH="$(jq -r .branch /data/options.json 2>/dev/null || true)"
-TOKEN_OPT="$(jq -r .github_token /data/options.json)"
+REF="$(jq -r '.ref // empty' /data/options.json 2>/dev/null || true)"
+TOKEN_OPT="$(jq -r '.github_token // empty' /data/options.json)"
 
 if [ -z "${REPO_URL}" ] || [ "${REPO_URL}" = "null" ]; then
   log "repo_url is empty; set it in add-on options"
@@ -226,46 +131,46 @@ else
   log "sshd disabled (no authorized keys)"
 fi
 
-if [ "${BRANCH}" = "null" ]; then
-  BRANCH=""
+if [ "${REF}" = "null" ]; then
+  REF=""
 fi
 
-if [ -n "${BRANCH}" ]; then
-  log "branch=${BRANCH}"
+if [ -n "${REF}" ]; then
+  log "ref=${REF}"
 fi
+
+checkout_ref() {
+  local ref="$1"
+
+  if [ -n "${ref}" ]; then
+    if git -C "${REPO_DIR}" rev-parse --verify "origin/${ref}" >/dev/null 2>&1; then
+      log "Checking out branch: ${ref}"
+      git -C "${REPO_DIR}" checkout -B "${ref}" "origin/${ref}"
+    else
+      log "Checking out tag/commit: ${ref}"
+      git -C "${REPO_DIR}" checkout --force "${ref}"
+    fi
+  else
+    DEFAULT_BRANCH=$(git -C "${REPO_DIR}" remote show origin | sed -n '/HEAD branch/s/.*: //p')
+    git -C "${REPO_DIR}" checkout "${DEFAULT_BRANCH}"
+    git -C "${REPO_DIR}" reset --hard "origin/${DEFAULT_BRANCH}"
+  fi
+  git -C "${REPO_DIR}" clean -fd
+}
 
 if [ ! -d "${REPO_DIR}/.git" ]; then
   log "cloning repo ${REPO_URL} -> ${REPO_DIR}"
   rm -rf "${REPO_DIR}"
-  if [ -n "${BRANCH}" ]; then
-    git clone --branch "${BRANCH}" "${REPO_URL}" "${REPO_DIR}"
-  else
-    git clone "${REPO_URL}" "${REPO_DIR}"
-  fi
+  git clone "${REPO_URL}" "${REPO_DIR}"
+  git -C "${REPO_DIR}" fetch --prune --tags
+  checkout_ref "${REF}"
 else
   log "updating repo in ${REPO_DIR}"
   git -C "${REPO_DIR}" remote set-url origin "${REPO_URL}"
   git -C "${REPO_DIR}" fetch --prune --tags
   git -C "${REPO_DIR}" reset --hard
   git -C "${REPO_DIR}" clean -fd
-  if [ -n "${BRANCH}" ]; then
-    # Check if "origin/${BRANCH}" exists (meaning it's a branch)
-    if git -C "${REPO_DIR}" rev-parse --verify "origin/${BRANCH}" >/dev/null 2>&1; then
-      log "Checking out branch: ${BRANCH}"
-      # Reset local branch to match remote exactly
-      git -C "${REPO_DIR}" checkout -B "${BRANCH}" "origin/${BRANCH}"
-    else
-      # If not found on origin, treat it as a Tag or Commit SHA
-      log "Checking out tag/commit: ${BRANCH}"
-      git -C "${REPO_DIR}" checkout --force "${BRANCH}"
-    fi
-  else
-    # Fallback to default branch if no specific branch/tag is defined
-    DEFAULT_BRANCH=$(git -C "${REPO_DIR}" remote show origin | sed -n '/HEAD branch/s/.*: //p')
-    git -C "${REPO_DIR}" checkout "${DEFAULT_BRANCH}"
-    git -C "${REPO_DIR}" reset --hard "origin/${DEFAULT_BRANCH}"
-  fi
-  git -C "${REPO_DIR}" clean -fd
+  checkout_ref "${REF}"
 fi
 
 cd "${REPO_DIR}"
@@ -282,29 +187,29 @@ fi
 log "building control UI"
 pnpm ui:build
 
-if [ ! -f "${MOLTBOT_CONFIG_PATH}" ]; then
-  pnpm moltbot setup --workspace "${WORKSPACE_DIR}"
+if [ ! -f "${OPENCLAW_CONFIG_PATH}" ]; then
+  pnpm openclaw setup
 else
-  log "config exists; skipping moltbot setup"
+  log "config exists; skipping openclaw setup"
 fi
 
 ensure_gateway_mode() {
-  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.MOLTBOT_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const gateway=data.gateway||{};const mode=String(gateway.mode||'').trim();if(!mode){gateway.mode='local';data.gateway=gateway;fs.writeFileSync(p, JSON.stringify(data,null,2)+'\\n');console.log('updated');}else{console.log('unchanged');}" 2>/dev/null
+  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.OPENCLAW_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const gateway=data.gateway||{};const mode=String(gateway.mode||'').trim();if(!mode){gateway.mode='local';data.gateway=gateway;fs.writeFileSync(p, JSON.stringify(data,null,2)+'\\n');console.log('updated');}else{console.log('unchanged');}" 2>/dev/null
 }
 
 read_gateway_mode() {
-  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.MOLTBOT_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const gateway=data.gateway||{};const mode=String(gateway.mode||'').trim();if(mode){console.log(mode);}"; 2>/dev/null
+  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.OPENCLAW_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const gateway=data.gateway||{};const mode=String(gateway.mode||'').trim();if(mode){console.log(mode);}" 2>/dev/null
 }
 
 ensure_log_file() {
-  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.MOLTBOT_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const logging=data.logging||{};const file=String(logging.file||'').trim();if(!file){logging.file='/tmp/moltbot/moltbot.log';data.logging=logging;fs.writeFileSync(p, JSON.stringify(data,null,2)+'\\n');console.log('updated');}else{console.log('unchanged');}" 2>/dev/null
+  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.OPENCLAW_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const logging=data.logging||{};const file=String(logging.file||'').trim();if(!file){logging.file='/tmp/openclaw/openclaw.log';data.logging=logging;fs.writeFileSync(p, JSON.stringify(data,null,2)+'\\n');console.log('updated');}else{console.log('unchanged');}" 2>/dev/null
 }
 
 read_log_file() {
-  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.MOLTBOT_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const logging=data.logging||{};const file=String(logging.file||'').trim();if(file){console.log(file);}"; 2>/dev/null
+  node -e "const fs=require('fs');const JSON5=require('json5');const p=process.env.OPENCLAW_CONFIG_PATH;const raw=fs.readFileSync(p,'utf8');const data=JSON5.parse(raw);const logging=data.logging||{};const file=String(logging.file||'').trim();if(file){console.log(file);}" 2>/dev/null
 }
 
-if [ -f "${MOLTBOT_CONFIG_PATH}" ]; then
+if [ -f "${OPENCLAW_CONFIG_PATH}" ]; then
   mode_status="$(ensure_gateway_mode || true)"
   if [ "${mode_status}" = "updated" ]; then
     log "gateway.mode set to local (missing)"
@@ -315,8 +220,8 @@ if [ -f "${MOLTBOT_CONFIG_PATH}" ]; then
   fi
 fi
 
-LOG_FILE="/tmp/moltbot/moltbot.log"
-if [ -f "${MOLTBOT_CONFIG_PATH}" ]; then
+LOG_FILE="/tmp/openclaw/openclaw.log"
+if [ -f "${OPENCLAW_CONFIG_PATH}" ]; then
   log_status="$(ensure_log_file || true)"
   if [ "${log_status}" = "updated" ]; then
     log "logging.file set to ${LOG_FILE} (missing)"
@@ -329,6 +234,9 @@ if [ -f "${MOLTBOT_CONFIG_PATH}" ]; then
     log "failed to normalize logging.file (invalid config?)"
   fi
 fi
+
+LOG_DIR="$(dirname "${LOG_FILE}")"
+mkdir -p "${LOG_DIR}" 2>/dev/null || true
 
 PORT="$(jq -r .port /data/options.json)"
 VERBOSE="$(jq -r .verbose /data/options.json)"
@@ -355,7 +263,7 @@ if [ -z "${PORT}" ] || [ "${PORT}" = "null" ]; then
 fi
 
 ALLOW_UNCONFIGURED=()
-if [ ! -f "${MOLTBOT_CONFIG_PATH}" ]; then
+if [ ! -f "${OPENCLAW_CONFIG_PATH}" ]; then
   log "config missing; allowing unconfigured gateway start"
   ALLOW_UNCONFIGURED=(--allow-unconfigured)
 else
@@ -477,7 +385,7 @@ trap forward_usr1 USR1
 trap shutdown_child TERM INT
 
 while true; do
-  pnpm moltbot "${ARGS[@]}" &
+  pnpm openclaw "${ARGS[@]}" &
   child_pid=$!
   start_log_tail "${LOG_FILE}"
   set +e

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+- Rename add-on to OpenClaw and refresh documentation/metadata.
+- Switch persistent data root to /config/openclaw.
+- Replace branch option with ref for tag/commit/branch pinning.
+- Default upstream repo to openclaw/openclaw.
+- Docker: set WORKDIR to /opt/openclaw.
+
 ## 0.2.20
 - Rename legacy files before directories during migration.
 
