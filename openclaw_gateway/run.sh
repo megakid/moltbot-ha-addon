@@ -5,7 +5,7 @@ log() {
   printf "[addon] %s\n" "$*"
 }
 
-log "run.sh version=2026-01-31-openclaw-ref"
+log "run.sh version=2026-01-31-openclaw-update"
 
 BASE_DIR=/config/openclaw
 STATE_DIR="${BASE_DIR}/.openclaw"
@@ -50,6 +50,7 @@ fi
 export HOME="${BASE_DIR}"
 export OPENCLAW_STATE_DIR="${STATE_DIR}"
 export OPENCLAW_CONFIG_PATH="${STATE_DIR}/openclaw.json"
+export OPENCLAW_GIT_DIR="${REPO_DIR}"
 
 log "config path=${OPENCLAW_CONFIG_PATH}"
 
@@ -59,6 +60,7 @@ export GH_CONFIG_DIR="/config/openclaw/.config/gh"
 export PATH="/config/openclaw/bin:${PATH}"
 export OPENCLAW_STATE_DIR="/config/openclaw/.openclaw"
 export OPENCLAW_CONFIG_PATH="/config/openclaw/.openclaw/openclaw.json"
+export OPENCLAW_GIT_DIR="/config/openclaw/openclaw-src"
 if [ -n "${SSH_CONNECTION:-}" ]; then
   cd "/config/openclaw/openclaw-src" 2>/dev/null || true
 fi
@@ -73,7 +75,7 @@ auth_from_opts() {
 }
 
 REPO_URL="$(jq -r .repo_url /data/options.json)"
-REF="$(jq -r '.ref // empty' /data/options.json 2>/dev/null || true)"
+UPDATE_CHANNEL="$(jq -r '.update_channel // empty' /data/options.json 2>/dev/null || true)"
 TOKEN_OPT="$(jq -r '.github_token // empty' /data/options.json)"
 
 if [ -z "${REPO_URL}" ] || [ "${REPO_URL}" = "null" ]; then
@@ -131,61 +133,83 @@ else
   log "sshd disabled (no authorized keys)"
 fi
 
-if [ "${REF}" = "null" ]; then
-  REF=""
-fi
-
-if [ -n "${REF}" ]; then
-  log "ref=${REF}"
-fi
-
-checkout_ref() {
-  local ref="$1"
-
-  if [ -n "${ref}" ]; then
-    if git -C "${REPO_DIR}" rev-parse --verify "origin/${ref}" >/dev/null 2>&1; then
-      log "Checking out branch: ${ref}"
-      git -C "${REPO_DIR}" checkout -B "${ref}" "origin/${ref}"
-    else
-      log "Checking out tag/commit: ${ref}"
-      git -C "${REPO_DIR}" checkout --force "${ref}"
-    fi
-  else
-    DEFAULT_BRANCH=$(git -C "${REPO_DIR}" remote show origin | sed -n '/HEAD branch/s/.*: //p')
-    git -C "${REPO_DIR}" checkout "${DEFAULT_BRANCH}"
-    git -C "${REPO_DIR}" reset --hard "origin/${DEFAULT_BRANCH}"
-  fi
-  git -C "${REPO_DIR}" clean -fd
-}
-
 if [ ! -d "${REPO_DIR}/.git" ]; then
   log "cloning repo ${REPO_URL} -> ${REPO_DIR}"
   rm -rf "${REPO_DIR}"
   git clone "${REPO_URL}" "${REPO_DIR}"
-  git -C "${REPO_DIR}" fetch --prune --tags
-  checkout_ref "${REF}"
 else
-  log "updating repo in ${REPO_DIR}"
+  log "using repo in ${REPO_DIR}"
   git -C "${REPO_DIR}" remote set-url origin "${REPO_URL}"
-  git -C "${REPO_DIR}" fetch --prune --tags
-  git -C "${REPO_DIR}" reset --hard
-  git -C "${REPO_DIR}" clean -fd
-  checkout_ref "${REF}"
+fi
+
+before_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"
+branch_name="$(git -C "${REPO_DIR}" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+
+log "checking for repo updates"
+if git -C "${REPO_DIR}" fetch --all --prune --tags; then
+  if [ -n "${branch_name}" ] && [ "${branch_name}" != "HEAD" ]; then
+    if ! git -C "${REPO_DIR}" pull --rebase; then
+      log "git pull failed; continuing without update"
+    fi
+  else
+    log "repo is detached; skipping pull"
+  fi
+else
+  log "git fetch failed; continuing without update"
+fi
+
+after_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"
+
+if [ -n "${before_sha}" ] && [ -n "${after_sha}" ] && [ "${before_sha}" != "${after_sha}" ]; then
+  log "repo updated (${before_sha} -> ${after_sha}); running git install"
+  OPENCLAW_INSTALL_METHOD=git \
+    OPENCLAW_GIT_DIR="${REPO_DIR}" \
+    OPENCLAW_GIT_UPDATE=0 \
+    OPENCLAW_NO_PROMPT=1 \
+    OPENCLAW_NO_ONBOARD=1 \
+    curl -fsSL https://openclaw.bot/install.sh | bash -s -- \
+      --install-method git \
+      --git-dir "${REPO_DIR}" \
+      --no-git-update \
+      --no-prompt \
+      --no-onboard
+else
+  log "repo unchanged; skipping git install"
+fi
+
+if [ "${UPDATE_CHANNEL}" = "null" ]; then
+  UPDATE_CHANNEL=""
+fi
+
+if [ -n "${UPDATE_CHANNEL}" ]; then
+  case "${UPDATE_CHANNEL}" in
+    stable|beta|dev) ;;
+    *)
+      log "update_channel=${UPDATE_CHANNEL} is invalid; ignoring"
+      UPDATE_CHANNEL=""
+      ;;
+  esac
+fi
+
+if [ -n "${UPDATE_CHANNEL}" ]; then
+  log "update_channel=${UPDATE_CHANNEL}"
 fi
 
 cd "${REPO_DIR}"
 
-log "installing dependencies"
 pnpm config set confirmModulesPurge false >/dev/null 2>&1 || true
-pnpm install --no-frozen-lockfile --prefer-frozen-lockfile
-log "building gateway"
-pnpm build
-if [ ! -d "${REPO_DIR}/ui/node_modules" ]; then
-  log "installing UI dependencies"
-  pnpm ui:install
+if [ ! -x "${REPO_DIR}/node_modules/.bin/openclaw" ]; then
+  log "bootstrap dependencies for openclaw CLI"
+  pnpm install --no-frozen-lockfile --prefer-frozen-lockfile
 fi
-log "building control UI"
-pnpm ui:build
+
+log "running openclaw update"
+update_args=(update)
+if [ -n "${UPDATE_CHANNEL}" ]; then
+  update_args+=(--channel "${UPDATE_CHANNEL}")
+fi
+update_args+=(--no-restart)
+pnpm openclaw "${update_args[@]}"
 
 if [ ! -f "${OPENCLAW_CONFIG_PATH}" ]; then
   pnpm openclaw setup
