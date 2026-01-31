@@ -37,7 +37,7 @@ This add-on runs the OpenClaw Gateway on Home Assistant OS, providing secure rem
 The add-on performs these steps on startup:
 
 1. Clones or updates the OpenClaw repo into `/config/openclaw/openclaw-src`
-2. Runs the OpenClaw git installer on first clone
+2. Runs the OpenClaw git installer on first clone or when `dist/entry.js` is missing
 3. Bootstraps the OpenClaw CLI if needed
 4. Runs `pnpm openclaw update --no-restart` (handles fetch/build/doctor)
 5. Runs `openclaw setup` if no config exists

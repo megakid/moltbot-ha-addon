@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.3
+- Startup: run OpenClaw git installer if dist entry is missing.
+
 ## 0.4.2
 - Startup: run OpenClaw git installer on first clone to avoid missing dist on initial boot.
 

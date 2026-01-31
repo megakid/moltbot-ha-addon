@@ -163,8 +163,12 @@ fi
 after_sha="$(git -C "${REPO_DIR}" rev-parse HEAD 2>/dev/null || true)"
 
 should_install=0
+dist_entry="${REPO_DIR}/dist/entry.js"
 if [ "${REPO_CLONED}" -eq 1 ]; then
   log "repo freshly cloned; running git install"
+  should_install=1
+elif [ ! -f "${dist_entry}" ]; then
+  log "dist entry missing; running git install"
   should_install=1
 elif [ -n "${before_sha}" ] && [ -n "${after_sha}" ] && [ "${before_sha}" != "${after_sha}" ]; then
   log "repo updated (${before_sha} -> ${after_sha}); running git install"
